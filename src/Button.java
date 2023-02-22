@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Button extends Rectangle{
-    boolean selected = false;
+    public boolean selected = false;
     int id;
     int x;
     int y;
@@ -36,6 +36,40 @@ public class Button extends Rectangle{
                 break;
         }
     }
+    private void textAdding(Graphics gr){
+        gr.setColor(Color.black);
+        gr.setFont(new Font("Courier",Font.PLAIN,30));
+        switch (this.id) {
+            case 1:
+                gr.drawString("1 player", this.x + 50, this.y + 45);
+                break;
+            case 2:
+                gr.drawString("2 players offline", this.x + 5, this.y + 45);
+                break;
+            case 3:
+                gr.drawString("2 players online", this.x + 7, this.y + 45);
+                break;
+            case 4:
+                gr.drawString("Pink", this.x + 80, this.y + 45);
+                break;
+            case 5:
+                gr.drawString("Green", this.x + 70, this.y + 45);
+                break;
+            case 6:
+                gr.drawString("Orange", this.x + 60, this.y + 45);
+                break;
+            case 7:
+                gr.drawString("Blue", this.x + 80, this.y + 45);
+                break;
+            case 8:
+                gr.drawString("Red", this.x + 85, this.y + 45);
+                break;
+            case 9:
+                gr.drawString("Cyan", this.x + 80, this.y + 45);
+                break;
+        }
+
+    }
     public void draw(Graphics gr){
 
         if (selected){
@@ -45,7 +79,7 @@ public class Button extends Rectangle{
         }
         colorSetting(gr);
         gr.fillRect(x, y, width, height);
-
+        textAdding(gr);
 
 
     }
