@@ -70,9 +70,13 @@ public class Button extends Rectangle{
         }
 
     }
+    public void changeSelection(int unSelect, int select){
+        if (this.id == unSelect) this.selected = false;
+        if (this.id == select) this.selected = true;
+    }
     public void draw(Graphics gr){
 
-        if (selected){
+        if (this.selected){
             gr.setColor(Color.black);
 
             gr.fillRect(x-7, y-7, width+14, height+14);

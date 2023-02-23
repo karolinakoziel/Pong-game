@@ -29,47 +29,55 @@ public class BeginningFrame{
         this.GAME_HEIGHT = GAME_HEIGHT;
     }
     public void keyPressed(KeyEvent e) {
-        switch (this.mode) {
-            case 1:
-                if (e.getKeyCode()==KeyEvent.VK_W || e.getKeyCode()==KeyEvent.VK_UP) {
-                    switch (curSelectedId){
-                        case 1:
-                            oneP.selected = false;
-                            twoPOnline.selected = true;
-                            curSelectedId = 3;
-                            break;
-                        case 2:
-                            twoPOffline.selected = false;
-                            oneP.selected = true;
-                            curSelectedId = 1;
-                            break;
-                        case 3:
-                            twoPOnline.selected = false;
-                            twoPOffline.selected = true;
-                            curSelectedId = 2;
-                            break;
-                    }
-                } else if (e.getKeyCode()==KeyEvent.VK_S || e.getKeyCode()==KeyEvent.VK_DOWN) {
-                    switch (curSelectedId){
-                        case 1:
-                            oneP.selected = false;
-                            twoPOffline.selected = true;
-                            curSelectedId = 2;
-                            break;
-                        case 2:
-                            twoPOffline.selected = false;
-                            twoPOnline.selected = true;
-                            curSelectedId = 3;
-                            break;
-                        case 3:
-                            twoPOnline.selected = false;
-                            oneP.selected = true;
-                            curSelectedId = 1;
-                            break;
-                    }
-                }
+        if (e.getKeyCode()==KeyEvent.VK_W || e.getKeyCode()==KeyEvent.VK_UP) {
+            if (this.curSelectedId == 1 && this.mode == 1){
+                oneP.changeSelection(1,3);
+                twoPOnline.changeSelection(1,3);
+                twoPOffline.changeSelection(1,3);
+                this.curSelectedId = 3;
+            } else if (this.curSelectedId == 4 && this.mode >= 2) {
+                for (Button b : colorButtons) b.changeSelection(4,9);
+                this.curSelectedId = 9;
+            }else if (this.mode == 1){
+                oneP.changeSelection(this.curSelectedId, this.curSelectedId - 1);
+                twoPOnline.changeSelection(this.curSelectedId, this.curSelectedId - 1);
+                twoPOffline.changeSelection(this.curSelectedId, this.curSelectedId - 1);
+                this.curSelectedId--;
+            } else {
+                for (Button b : colorButtons) b.changeSelection(this.curSelectedId, this.curSelectedId - 1);
+                this.curSelectedId--;
+            }
+        } else if (e.getKeyCode()==KeyEvent.VK_S || e.getKeyCode()==KeyEvent.VK_DOWN) {
+            if (this.curSelectedId == 3 && this.mode == 1){
+                oneP.changeSelection(3,1);
+                twoPOnline.changeSelection(3,1);
+                twoPOffline.changeSelection(3,1);
+                this.curSelectedId = 1;
+            } else if (this.curSelectedId == 9 && this.mode >= 2) {
+                for (Button b : colorButtons) b.changeSelection(9, 4);
+                this.curSelectedId = 4;
+            } else if (this.mode == 1){
+                oneP.changeSelection(this.curSelectedId, this.curSelectedId + 1);
+                twoPOnline.changeSelection(this.curSelectedId, this.curSelectedId + 1);
+                twoPOffline.changeSelection(this.curSelectedId, this.curSelectedId + 1);
+                this.curSelectedId++;
+            } else {
+                for (Button b : colorButtons) b.changeSelection(this.curSelectedId, this.curSelectedId + 1);
+                this.curSelectedId++;
+            }
+        } else if (e.getKeyCode()==KeyEvent.VK_D || e.getKeyCode()==KeyEvent.VK_RIGHT) {
+            if (this.mode >= 2 && this.curSelectedId <= 6) {
+                for (Button b : colorButtons) b.changeSelection(this.curSelectedId, this.curSelectedId + 3);
+                this.curSelectedId = this.curSelectedId + 3;
+            }
+        } else if (e.getKeyCode()==KeyEvent.VK_A || e.getKeyCode()==KeyEvent.VK_LEFT) {
+            if (this.mode >= 2 && this.curSelectedId > 6) {
+                for (Button b : colorButtons) b.changeSelection(this.curSelectedId, this.curSelectedId - 3);
+                this.curSelectedId = this.curSelectedId - 3;
+            }
         }
-        //zmiana modu
+
+        //zmiana modu i curSelected
     }
 
     public void draw(Graphics gr) {
