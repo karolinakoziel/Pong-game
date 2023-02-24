@@ -19,7 +19,7 @@ public class GameFrame extends JPanel implements Runnable{
     Ball ball;
     Score score;
     BeginningFrame begFrame;
-    boolean gameStarted = false;
+    Boolean started = false;
 
     GameFrame(){
         this.begFrame = new BeginningFrame(GAME_WIDTH, GAME_HEIGHT);
@@ -38,8 +38,8 @@ public class GameFrame extends JPanel implements Runnable{
         ball = new Ball((GAME_WIDTH/2)-(BALL_DIAMETER/2),random.nextInt(GAME_HEIGHT-BALL_DIAMETER),BALL_DIAMETER,BALL_DIAMETER);
     }
     public void newPaddles() {
-        paddle1 = new Paddle(0,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,1);
-        paddle2 = new Paddle(GAME_WIDTH-PADDLE_WIDTH,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,2);
+        paddle1 = new Paddle(0,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,1, begFrame.col1);
+        paddle2 = new Paddle(GAME_WIDTH-PADDLE_WIDTH,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,2, begFrame.col2);
     }
     public void paint(Graphics g) {
         image = createImage(getWidth(),getHeight());
@@ -48,7 +48,7 @@ public class GameFrame extends JPanel implements Runnable{
         g.drawImage(image,0,0,this);
     }
     public void draw(Graphics g) {
-        if (!gameStarted) {
+        if (!begFrame.end) {
             begFrame.draw(g);
         } else {
             paddle1.draw(g);
@@ -127,7 +127,13 @@ public class GameFrame extends JPanel implements Runnable{
             delta += (now -lastTime)/ns;
             lastTime = now;
             if(delta >=1) {
-                if(gameStarted){
+                if (begFrame.end && !started) {
+                    newPaddles();
+                    move();
+                    checkCollision();
+                    started = true;
+                }
+                if(begFrame.end){
                     move();
                     checkCollision();
                 }
@@ -138,7 +144,7 @@ public class GameFrame extends JPanel implements Runnable{
     }
     public class AL extends KeyAdapter{
         public void keyPressed(KeyEvent e) {
-            if (!gameStarted) {
+            if (!begFrame.end) {
                 begFrame.keyPressed(e);
             } else {
                 paddle1.keyPressed(e);

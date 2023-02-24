@@ -8,13 +8,16 @@ public class BeginningFrame{
     Button twoPOnline;
     Button oneP;
     List<Button> colorButtons = new ArrayList<Button>();
-    boolean end = false;
+    public boolean end = false;
     static final int BUTTON_WIDTH = 220;
     static final int BUTTON_HEIGHT = 70;
     int GAME_WIDTH;
     int GAME_HEIGHT;
     int mode = 1; //1-choosing game kind, 2-choosing colour for player 1, 3-choosing colour for player 2
     int curSelectedId = 1;
+    public int chosenType;
+    public Color col1;
+    public Color col2;
     BeginningFrame(int GAME_WIDTH, int GAME_HEIGHT){
         oneP = new Button(GAME_WIDTH/2 - BUTTON_WIDTH/2, GAME_HEIGHT/3, BUTTON_WIDTH, BUTTON_HEIGHT,1);
         twoPOffline = new Button(GAME_WIDTH/2 - BUTTON_WIDTH/2, GAME_HEIGHT/9*5, BUTTON_WIDTH, BUTTON_HEIGHT, 2);
@@ -75,11 +78,80 @@ public class BeginningFrame{
                 for (Button b : colorButtons) b.changeSelection(this.curSelectedId, this.curSelectedId - 3);
                 this.curSelectedId = this.curSelectedId - 3;
             }
+        } else if (e.getKeyCode()==KeyEvent.VK_ENTER || e.getKeyCode()==KeyEvent.VK_SPACE) {
+            switch (this.mode) {
+                case 1:
+                    chosenType = curSelectedId;
+                    mode = 2;
+                    curSelectedId = 4;
+                    break;
+                case 2:
+                    choseColor();
+                    if (chosenType == 2){
+                        mode = 3;
+                        for (Button b : colorButtons) b.changeSelection(this.curSelectedId, 4);
+                        this.curSelectedId = 4;
+                    } else if (this.chosenType == 1) {
+                        col2 = Color.gray;
+                        end = true;
+                    } else {
+                        //TODO: kolor drugiego gracza z servera
+                        end = true;
+                    }
+                    break;
+                case 3:
+                    choseColor();
+                    end = true;
+                    break;
+            }
+        }
+    }
+    private void choseColor(){
+        if (this.mode == 2) {
+            switch(curSelectedId){
+                case 4:
+                    col1 = Color.pink;
+                    break;
+                case 5:
+                    col1 = Color.green;
+                    break;
+                case 6:
+                    col1 = Color.orange;
+                    break;
+                case 7:
+                    col1 = Color.blue;
+                    break;
+                case 8:
+                    col1 = Color.red;
+                    break;
+                case 9:
+                    col1 = Color.cyan;
+                    break;
+            }
+        } else {
+            switch(curSelectedId){
+                case 4:
+                    col2 = Color.pink;
+                    break;
+                case 5:
+                    col2 = Color.green;
+                    break;
+                case 6:
+                    col2 = Color.orange;
+                    break;
+                case 7:
+                    col2 = Color.blue;
+                    break;
+                case 8:
+                    col2 = Color.red;
+                    break;
+                case 9:
+                    col2 = Color.cyan;
+                    break;
+            }
         }
 
-        //zmiana modu i curSelected
     }
-
     public void draw(Graphics gr) {
         switch (this.mode) {
             case 1:
