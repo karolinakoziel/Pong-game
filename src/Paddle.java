@@ -7,11 +7,13 @@ public class Paddle extends Rectangle{
     int yVelocity;
     int speed = 10;
     Color paddleColor;
+    int type;
 
-    Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT, int id, Color col){
+    Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT, int id, Color col, int type){ //1-letters and numbers 2-letters or numbers 3-automatic 4-server
         super(x,y,PADDLE_WIDTH,PADDLE_HEIGHT);
         this.paddleColor = col;
-        this.id=id;
+        this.id = id;
+        this.type = type;
     }
 
     public void keyPressed(KeyEvent e) {

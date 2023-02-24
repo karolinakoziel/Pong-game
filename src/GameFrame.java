@@ -38,8 +38,21 @@ public class GameFrame extends JPanel implements Runnable{
         ball = new Ball((GAME_WIDTH/2)-(BALL_DIAMETER/2),random.nextInt(GAME_HEIGHT-BALL_DIAMETER),BALL_DIAMETER,BALL_DIAMETER);
     }
     public void newPaddles() {
-        paddle1 = new Paddle(0,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,1, begFrame.col1);
-        paddle2 = new Paddle(GAME_WIDTH-PADDLE_WIDTH,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,2, begFrame.col2);
+        int type1,type2;
+        switch (begFrame.mode) {
+            case 1:
+                type1 = 1;
+                type2 = 3;
+                break;
+            case 3:
+                type1 = 1;
+                type2 = 4;
+                break;
+            default:
+                type1 = type2 = 2;
+        }
+        paddle1 = new Paddle(0,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,1, begFrame.col1, type1);
+        paddle2 = new Paddle(GAME_WIDTH-PADDLE_WIDTH,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,2, begFrame.col2, type2);
     }
     public void paint(Graphics g) {
         image = createImage(getWidth(),getHeight());
@@ -59,6 +72,9 @@ public class GameFrame extends JPanel implements Runnable{
         }
     }
     public void move() {
+        switch (begFrame.chosenType) {
+            case 1:
+        }
         paddle1.move();
         paddle2.move();
         ball.move();
