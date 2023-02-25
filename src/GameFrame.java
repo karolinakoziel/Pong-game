@@ -20,6 +20,7 @@ public class GameFrame extends JPanel implements Runnable{
     Score score;
     BeginningFrame begFrame;
     Boolean started = false;
+    int winner = 0;
 
     GameFrame(){
         this.begFrame = new BeginningFrame(GAME_WIDTH, GAME_HEIGHT);
@@ -60,21 +61,23 @@ public class GameFrame extends JPanel implements Runnable{
         draw(graphics);
         g.drawImage(image,0,0,this);
     }
-    public void draw(Graphics g) {
+    public void draw(Graphics gr) {
         if (!begFrame.end) {
-            begFrame.draw(g);
+            begFrame.draw(gr);
+        } else if(winner > 0) {
+            if (winner == 1) gr.setColor(begFrame.col1);
+            else gr.setColor(begFrame.col2);
+            gr.setFont(new Font("Algerian",Font.PLAIN,GAME_WIDTH/14));
+            gr.drawString("PLAYER " + winner + " WON", GAME_WIDTH/4, GAME_HEIGHT/5 );
         } else {
-            paddle1.draw(g);
-            paddle2.draw(g);
-            ball.draw(g);
-            score.draw(g);
+            paddle1.draw(gr);
+            paddle2.draw(gr);
+            ball.draw(gr);
+            score.draw(gr);
             Toolkit.getDefaultToolkit().sync();
         }
     }
     public void move() {
-        switch (begFrame.chosenType) {
-            case 1:
-        }
         paddle1.move();
         paddle2.move();
         ball.move();
@@ -123,13 +126,13 @@ public class GameFrame extends JPanel implements Runnable{
             score.player2++;
             newPaddles();
             newBall();
-            System.out.println("Player 2: "+score.player2);
+            if (score.player2 >= 10) winner = 2;
         }
         if(ball.x >= GAME_WIDTH-BALL_DIAMETER) {
             score.player1++;
             newPaddles();
             newBall();
-            System.out.println("Player 1: "+score.player1);
+            if (score.player1 >= 10) winner = 1;
         }
     }
     public void run() {
@@ -143,16 +146,18 @@ public class GameFrame extends JPanel implements Runnable{
             delta += (now -lastTime)/ns;
             lastTime = now;
             if(delta >=1) {
-                if (begFrame.end && !started) {
+                if (begFrame.end && !started && winner == 0) {
                     newPaddles();
+                    newBall();
                     move();
                     checkCollision();
                     started = true;
                 }
-                if(begFrame.end){
+                if (begFrame.end && winner == 0){
                     move();
                     checkCollision();
                 }
+
                 repaint();
                 delta--;
             }

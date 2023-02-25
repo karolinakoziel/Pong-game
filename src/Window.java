@@ -6,6 +6,8 @@ public class Window extends JFrame{
     Window(){
         panel = new GameFrame();
         this.add(panel);
+        ImageIcon img = new ImageIcon("src/pingpong.png");
+        this.setIconImage(img.getImage());
         this.setTitle("Pong");
         this.setBackground(Color.white);
         this.setVisible(true);

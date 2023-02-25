@@ -95,8 +95,8 @@ public class BeginningFrame{
                         col2 = Color.gray;
                         end = true;
                     } else {
-                        //TODO: kolor drugiego gracza z servera
-                        end = true;
+                        //TODO: kolor drugiego gracza z servera i end = true
+
                     }
                     break;
                 case 3:
@@ -170,7 +170,7 @@ public class BeginningFrame{
                 gr.setFont(new Font("Algerian",Font.PLAIN,GAME_WIDTH/12));
                 gr.drawString("CHOOSE COLOR", GAME_WIDTH/4-20, GAME_HEIGHT/6 );
                 gr.setFont(new Font("Baumans",Font.PLAIN,GAME_WIDTH/19));
-                gr.drawString("For player" + String.valueOf(mode - 1), GAME_WIDTH/3+40, GAME_HEIGHT/4+10 );
+                gr.drawString("For player " + String.valueOf(mode - 1), GAME_WIDTH/3+40, GAME_HEIGHT/4+10 );
         }
 
 
