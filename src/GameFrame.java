@@ -40,7 +40,7 @@ public class GameFrame extends JPanel implements Runnable{
     }
     public void newPaddles() {
         int type1,type2;
-        switch (begFrame.mode) {
+        switch (begFrame.chosenType) {
             case 1:
                 type1 = 1;
                 type2 = 3;
@@ -78,6 +78,10 @@ public class GameFrame extends JPanel implements Runnable{
         }
     }
     public void move() {
+        if (begFrame.chosenType == 1) {
+            if (ball.x > GAME_WIDTH / 2) paddle2.automaticMove(ball.y);
+            else paddle2.automaticMove(GAME_HEIGHT/2);
+        }
         paddle1.move();
         paddle2.move();
         ball.move();

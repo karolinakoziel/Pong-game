@@ -9,6 +9,7 @@ public class Paddle extends Rectangle{
     Color paddleColor;
     int type;
 
+
     Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT, int id, Color col, int type){ //1-letters and numbers 2-letters or numbers 3-automatic 4-server
         super(x,y,PADDLE_WIDTH,PADDLE_HEIGHT);
         this.paddleColor = col;
@@ -17,43 +18,39 @@ public class Paddle extends Rectangle{
     }
 
     public void keyPressed(KeyEvent e) {
-        switch(id) {
-            case 1:
-                if(e.getKeyCode()==KeyEvent.VK_W) {
-                    setYDirection(-speed);
-                }
-                if(e.getKeyCode()==KeyEvent.VK_S) {
-                    setYDirection(speed);
-                }
-                break;
-            case 2:
-                if(e.getKeyCode()==KeyEvent.VK_UP) {
-                    setYDirection(-speed);
-                }
-                if(e.getKeyCode()==KeyEvent.VK_DOWN) {
-                    setYDirection(speed);
-                }
-                break;
+        if(this.type == 1 || (this.type == 2 && this.id == 1)) {
+            if(e.getKeyCode()==KeyEvent.VK_W) {
+                setYDirection(-speed);
+            }
+            if(e.getKeyCode()==KeyEvent.VK_S) {
+                setYDirection(speed);
+            }
+        }
+        if (this.type == 1 || (this.type == 2 && this.id == 2)) {
+            if(e.getKeyCode()==KeyEvent.VK_UP) {
+                setYDirection(-speed);
+            }
+            if(e.getKeyCode()==KeyEvent.VK_DOWN) {
+                setYDirection(speed);
+            }
         }
     }
     public void keyReleased(KeyEvent e) {
-        switch(id) {
-            case 1:
-                if(e.getKeyCode()==KeyEvent.VK_W) {
-                    setYDirection(0);
-                }
-                if(e.getKeyCode()==KeyEvent.VK_S) {
-                    setYDirection(0);
-                }
-                break;
-            case 2:
-                if(e.getKeyCode()==KeyEvent.VK_UP) {
-                    setYDirection(0);
-                }
-                if(e.getKeyCode()==KeyEvent.VK_DOWN) {
-                    setYDirection(0);
-                }
-                break;
+        if(this.type == 1 || (this.type == 2 && this.id == 1)) {
+            if(e.getKeyCode()==KeyEvent.VK_W) {
+                setYDirection(0);
+            }
+            if(e.getKeyCode()==KeyEvent.VK_S) {
+                setYDirection(0);
+            }
+        }
+        if (this.type == 1 || (this.type == 2 && this.id == 2)) {
+            if(e.getKeyCode()==KeyEvent.VK_UP) {
+                setYDirection(0);
+            }
+            if(e.getKeyCode()==KeyEvent.VK_DOWN) {
+                setYDirection(0);
+            }
         }
     }
     public void setYDirection(int yDirection) {
@@ -63,8 +60,11 @@ public class Paddle extends Rectangle{
         y= y + yVelocity;
     }
     public void draw(Graphics g) {
-
         g.setColor(this.paddleColor);
         g.fillRect(x, y, width, height);
+    }
+    public void automaticMove(int yBall) {
+        if (y < yBall - 6) y = y + 7;
+        else if (y > yBall + 6) y = y - 7;
     }
 }
