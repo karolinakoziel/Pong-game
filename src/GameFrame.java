@@ -2,8 +2,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-
-public class GameFrame extends JPanel implements Runnable{
+import java.net.*;
+import java.io.*;
+//TODO: kolory i quit
+public class GameFrame extends JPanel implements Runnable {
+    static final String IP = "192.168.1.145";
     static final int GAME_WIDTH = 1000;
     static final int GAME_HEIGHT = 600;
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH,GAME_HEIGHT);
@@ -21,7 +24,9 @@ public class GameFrame extends JPanel implements Runnable{
     BeginningFrame begFrame;
     Boolean started = false;
     int winner = 0;
-
+    Socket socket = null;
+    DataOutputStream dout = null;
+    DataInputStream din = null;
     GameFrame(){
         this.begFrame = new BeginningFrame(GAME_WIDTH, GAME_HEIGHT);
         this.setFocusable(true);
@@ -69,6 +74,11 @@ public class GameFrame extends JPanel implements Runnable{
             else gr.setColor(begFrame.col2);
             gr.setFont(new Font("Algerian",Font.PLAIN,GAME_WIDTH/14));
             gr.drawString("PLAYER " + winner + " WON", GAME_WIDTH/4, GAME_HEIGHT/5 );
+            try {
+                dout.close();
+                socket.close();
+            } catch(Exception e){System.out.println(e);}
+
         } else {
             paddle1.draw(gr);
             paddle2.draw(gr);
@@ -128,21 +138,22 @@ public class GameFrame extends JPanel implements Runnable{
         //give a player 1 point and creates new paddles & ball
         if(ball.x <=0) {
             score.player2++;
+            System.out.println("2++");
             newPaddles();
             newBall();
             if (score.player2 >= 10) winner = 2;
         }
         if(ball.x >= GAME_WIDTH-BALL_DIAMETER) {
             score.player1++;
+            System.out.println("1++");
             newPaddles();
             newBall();
             if (score.player1 >= 10) winner = 1;
         }
     }
     public void run() {
-        //game loop
         long lastTime = System.nanoTime();
-        double amountOfTicks =60.0;
+        double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
         while(true) {
@@ -150,23 +161,47 @@ public class GameFrame extends JPanel implements Runnable{
             delta += (now -lastTime)/ns;
             lastTime = now;
             if(delta >=1) {
-                if (begFrame.end && !started && winner == 0) {
+                if (begFrame.end && !started) {
+                    if (begFrame.chosenType == 3) {
+                        try{
+                            socket = new Socket("localhost",6666);
+                            dout = new DataOutputStream(socket.getOutputStream());
+                            dout.writeUTF("Hello Server");
+                            dout.flush();
+                            din = new DataInputStream(socket.getInputStream());
+                            String message = din.readUTF();
+                        }catch(Exception e){System.out.println(e);}
+                    }
+
                     newPaddles();
                     newBall();
                     move();
                     checkCollision();
+                    System.out.println("start");
                     started = true;
                 }
                 if (begFrame.end && winner == 0){
+                    try {
+                        dout.writeUTF(Integer.toString(paddle1.y));
+                        dout.flush();
+                        String newY = din.readUTF();
+                        paddle2.y = Integer.valueOf(newY);
+                        //przeczytać odpowiedź
+                    } catch(Exception e){System.out.println(e);}
                     move();
                     checkCollision();
                 }
 
                 repaint();
                 delta--;
+
             }
+
+
         }
     }
+
+
     public class AL extends KeyAdapter{
         public void keyPressed(KeyEvent e) {
             if (!begFrame.end) {

@@ -95,8 +95,7 @@ public class BeginningFrame{
                         col2 = Color.gray;
                         end = true;
                     } else {
-                        //TODO: kolor drugiego gracza z servera i end = true
-
+                        end = true;
                     }
                     break;
                 case 3:
