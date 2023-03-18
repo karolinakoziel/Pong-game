@@ -9,7 +9,6 @@ public class Paddle extends Rectangle{
     Color paddleColor;
     int type;
 
-
     Paddle(int x, int y, int PADDLE_WIDTH, int PADDLE_HEIGHT, int id, Color col, int type){ //1-letters and numbers 2-letters or numbers 3-automatic 4-server
         super(x,y,PADDLE_WIDTH,PADDLE_HEIGHT);
         this.paddleColor = col;

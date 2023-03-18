@@ -27,6 +27,7 @@ public class GameFrame extends JPanel implements Runnable {
     Socket socket = null;
     DataOutputStream dout = null;
     DataInputStream din = null;
+    Boolean isMainPlayer = null;
     GameFrame(){
         this.begFrame = new BeginningFrame(GAME_WIDTH, GAME_HEIGHT);
         this.setFocusable(true);
@@ -94,10 +95,10 @@ public class GameFrame extends JPanel implements Runnable {
         }
         paddle1.move();
         paddle2.move();
-        ball.move();
+        if (begFrame.chosenType < 3 || isMainPlayer) ball.move();
+
     }
     public void checkCollision() {
-
         //bounce ball off top & bottom window edges
         if(ball.y <=0) {
             ball.setYDirection(-ball.yVelocity);
@@ -138,14 +139,12 @@ public class GameFrame extends JPanel implements Runnable {
         //give a player 1 point and creates new paddles & ball
         if(ball.x <=0) {
             score.player2++;
-            System.out.println("2++");
             newPaddles();
             newBall();
             if (score.player2 >= 10) winner = 2;
         }
         if(ball.x >= GAME_WIDTH-BALL_DIAMETER) {
             score.player1++;
-            System.out.println("1++");
             newPaddles();
             newBall();
             if (score.player1 >= 10) winner = 1;
@@ -166,27 +165,44 @@ public class GameFrame extends JPanel implements Runnable {
                         try{
                             socket = new Socket("localhost",6666);
                             dout = new DataOutputStream(socket.getOutputStream());
-                            dout.writeUTF("Hello Server");
+                            dout.writeUTF(getColorString(begFrame.col1));
                             dout.flush();
                             din = new DataInputStream(socket.getInputStream());
-                            String message = din.readUTF();
+                            String col = din.readUTF();
+                            System.out.println(col);
+                            begFrame.col2 = getColor(col);
+                            String num = din.readUTF();
+                            System.out.println(num);
+                            if (num.equals("1")) {
+                                isMainPlayer = true;
+                            }
+                            else isMainPlayer = false;
                         }catch(Exception e){System.out.println(e);}
                     }
 
                     newPaddles();
+                    paddle2.paddleColor = begFrame.col2;
                     newBall();
                     move();
                     checkCollision();
-                    System.out.println("start");
                     started = true;
                 }
                 if (begFrame.end && winner == 0){
                     try {
-                        dout.writeUTF(Integer.toString(paddle1.y));
+                        if (isMainPlayer) dout.writeUTF(Integer.toString(paddle1.y) + " " + Integer.toString(ball.x) + " " + Integer.toString(ball.y) + " " + score.player1 + " " + score.player2);
+                        else dout.writeUTF(Integer.toString(paddle1.y));
                         dout.flush();
-                        String newY = din.readUTF();
-                        paddle2.y = Integer.valueOf(newY);
-                        //przeczytać odpowiedź
+                        String received = din.readUTF();
+                        if (isMainPlayer) paddle2.y = Integer.valueOf(received);
+                        else {
+                            String[] words = received.split("\\s");
+                            paddle2.y = Integer.valueOf(words[0]);
+                            ball.x = GAME_WIDTH - Integer.valueOf(words[1]);
+                            ball.y = Integer.valueOf(words[2]);
+                            score.player1 = Integer.valueOf(words[4]);
+                            score.player2 = Integer.valueOf(words[3]);
+                        }
+
                     } catch(Exception e){System.out.println(e);}
                     move();
                     checkCollision();
@@ -201,6 +217,24 @@ public class GameFrame extends JPanel implements Runnable {
         }
     }
 
+    private String getColorString(Color col){
+        if (col.equals(Color.pink)) return "pink";
+        if (col.equals(Color.green)) return "green";
+        if (col.equals(Color.orange)) return "orange";
+        if (col.equals(Color.blue)) return "blue";
+        if (col.equals(Color.red)) return "red";
+        if (col.equals(Color.cyan)) return "cyan";
+        return "black";
+    }
+    private Color getColor(String name){
+        if (name.equals("pink")) return Color.pink;
+        if (name.equals("green")) return Color.green;
+        if (name.equals("orange")) return Color.orange;
+        if (name.equals("blue")) return Color.blue;
+        if (name.equals("red")) return Color.red;
+        if (name.equals("cyan")) return Color.cyan;
+        return Color.black;
+    }
 
     public class AL extends KeyAdapter{
         public void keyPressed(KeyEvent e) {
