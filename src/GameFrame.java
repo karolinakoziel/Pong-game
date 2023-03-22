@@ -4,7 +4,7 @@ import java.util.*;
 import javax.swing.*;
 import java.net.*;
 import java.io.*;
-//TODO: kolory i quit
+
 public class GameFrame extends JPanel implements Runnable {
     static final String IP = "192.168.1.145";
     static final int GAME_WIDTH = 1000;
@@ -28,6 +28,8 @@ public class GameFrame extends JPanel implements Runnable {
     DataOutputStream dout = null;
     DataInputStream din = null;
     Boolean isMainPlayer = null;
+    Boolean EnemyDisconnected = false;
+
     GameFrame(){
         this.begFrame = new BeginningFrame(GAME_WIDTH, GAME_HEIGHT);
         this.setFocusable(true);
@@ -44,6 +46,7 @@ public class GameFrame extends JPanel implements Runnable {
         random = new Random();
         ball = new Ball((GAME_WIDTH/2)-(BALL_DIAMETER/2),random.nextInt(GAME_HEIGHT-BALL_DIAMETER),BALL_DIAMETER,BALL_DIAMETER);
     }
+
     public void newPaddles() {
         int type1,type2;
         switch (begFrame.chosenType) {
@@ -61,16 +64,21 @@ public class GameFrame extends JPanel implements Runnable {
         paddle1 = new Paddle(0,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,1, begFrame.col1, type1);
         paddle2 = new Paddle(GAME_WIDTH-PADDLE_WIDTH,(GAME_HEIGHT/2)-(PADDLE_HEIGHT/2),PADDLE_WIDTH,PADDLE_HEIGHT,2, begFrame.col2, type2);
     }
+
     public void paint(Graphics g) {
         image = createImage(getWidth(),getHeight());
         graphics = image.getGraphics();
         draw(graphics);
         g.drawImage(image,0,0,this);
     }
+
     public void draw(Graphics gr) {
         if (!begFrame.end) {
             begFrame.draw(gr);
-        } else if(winner > 0) {
+        } else if (EnemyDisconnected) {
+            gr.setFont(new Font("Algerian",Font.PLAIN,GAME_WIDTH/14));
+            gr.drawString("PLAYER 2 DISCONNECTED", GAME_WIDTH/11, GAME_HEIGHT/5 );
+        }else if(winner > 0) {
             if (winner == 1) gr.setColor(begFrame.col1);
             else gr.setColor(begFrame.col2);
             gr.setFont(new Font("Algerian",Font.PLAIN,GAME_WIDTH/14));
@@ -79,7 +87,6 @@ public class GameFrame extends JPanel implements Runnable {
                 dout.close();
                 socket.close();
             } catch(Exception e){System.out.println(e);}
-
         } else {
             paddle1.draw(gr);
             paddle2.draw(gr);
@@ -88,6 +95,7 @@ public class GameFrame extends JPanel implements Runnable {
             Toolkit.getDefaultToolkit().sync();
         }
     }
+
     public void move() {
         if (begFrame.chosenType == 1) {
             if (ball.x > GAME_WIDTH / 2) paddle2.automaticMove(ball.y);
@@ -98,6 +106,7 @@ public class GameFrame extends JPanel implements Runnable {
         if (begFrame.chosenType < 3 || isMainPlayer) ball.move();
 
     }
+
     public void checkCollision() {
         //bounce ball off top & bottom window edges
         if(ball.y <=0) {
@@ -150,6 +159,7 @@ public class GameFrame extends JPanel implements Runnable {
             if (score.player1 >= 10) winner = 1;
         }
     }
+
     public void run() {
         long lastTime = System.nanoTime();
         double amountOfTicks = 60.0;
@@ -157,7 +167,7 @@ public class GameFrame extends JPanel implements Runnable {
         double delta = 0;
         while(true) {
             long now = System.nanoTime();
-            delta += (now -lastTime)/ns;
+            delta += (now - lastTime)/ns;
             lastTime = now;
             if(delta >=1) {
                 if (begFrame.end && !started) {
@@ -187,33 +197,34 @@ public class GameFrame extends JPanel implements Runnable {
                     checkCollision();
                     started = true;
                 }
-                if (begFrame.end && winner == 0){
-                    try {
-                        if (isMainPlayer) dout.writeUTF(Integer.toString(paddle1.y) + " " + Integer.toString(ball.x) + " " + Integer.toString(ball.y) + " " + score.player1 + " " + score.player2);
-                        else dout.writeUTF(Integer.toString(paddle1.y));
-                        dout.flush();
-                        String received = din.readUTF();
-                        if (isMainPlayer) paddle2.y = Integer.valueOf(received);
-                        else {
-                            String[] words = received.split("\\s");
-                            paddle2.y = Integer.valueOf(words[0]);
-                            ball.x = GAME_WIDTH - Integer.valueOf(words[1]);
-                            ball.y = Integer.valueOf(words[2]);
-                            score.player1 = Integer.valueOf(words[4]);
-                            score.player2 = Integer.valueOf(words[3]);
+                if (begFrame.end && winner == 0) {
+                    if (begFrame.chosenType == 3) {
+                        try {
+                            if (isMainPlayer)
+                                dout.writeUTF(Integer.toString(paddle1.y) + " " + Integer.toString(ball.x) + " " + Integer.toString(ball.y) + " " + score.player1 + " " + score.player2);
+                            else dout.writeUTF(Integer.toString(paddle1.y));
+                            dout.flush();
+                            String received = din.readUTF();
+                            if (isMainPlayer) paddle2.y = Integer.valueOf(received);
+                            else {
+                                String[] words = received.split("\\s");
+                                paddle2.y = Integer.valueOf(words[0]);
+                                ball.x = GAME_WIDTH - Integer.valueOf(words[1]);
+                                ball.y = Integer.valueOf(words[2]);
+                                score.player1 = Integer.valueOf(words[4]);
+                                score.player2 = Integer.valueOf(words[3]);
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Second player disconnected");
+                            EnemyDisconnected = true;
                         }
-
-                    } catch(Exception e){System.out.println(e);}
+                    }
                     move();
                     checkCollision();
                 }
-
                 repaint();
                 delta--;
-
             }
-
-
         }
     }
 
